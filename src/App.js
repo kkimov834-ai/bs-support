@@ -1,10 +1,10 @@
 import React, { use, useEffect, useState } from "react";
 import { ChakraProvider, Flex, Box, Center, Spinner } from "@chakra-ui/react";
-import useAuthCheck from "./useAuthCheck";
-import Header from "./header";
-import Sidebar from "./sidebar";
-import AISection from "./aiSection";
-import Modules from "./home";
+import useAuthCheck from "./hooks/useAuthCheck";
+import Header from "./Header";
+import Sidebar from "./Sidebar";
+import AISection from "./AiSection";
+import Modules from "./Home";
 
 function App() {
 	// 1. Auth Statusunu Yoxlayırıq

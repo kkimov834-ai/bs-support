@@ -8,7 +8,7 @@ import {
 	VStack,
 	Spacer,
 } from "@chakra-ui/react";
-import Terminal from "./terminal";
+import Terminal from "./Terminal";
 
 function AISection({ selectedUser }) {
 	return (

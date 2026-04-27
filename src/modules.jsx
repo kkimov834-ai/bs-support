@@ -103,11 +103,6 @@ function Modules() {
 			{/* Cədvəllər Bölümü */}
 			<VStack spacing={6} w="100%" align="stretch">
 				<VStack spacing={4} w="100%" align="stretch">
-					<ModuleSelect
-						availableModules={availableModulesToSelect}
-						selectedModules={currentCompanyModules}
-						onSelectModule={handleSelectModule}
-					/>
 					<ModuleTable
 						modules={currentCompanyModules}
 						title={`Cari Tarif (${selectedCompany})`}
@@ -115,6 +110,13 @@ function Modules() {
 						onRemoveModule={handleRemoveModule}
 						showResetButton={true}
 						onResetAll={handleResetAll}
+						footer={
+							<ModuleSelect
+								availableModules={availableModulesToSelect}
+								selectedModules={currentCompanyModules}
+								onSelectModule={handleSelectModule}
+							/>
+						}
 					/>
 				</VStack>
 
@@ -124,32 +126,57 @@ function Modules() {
 						(c) =>
 							c.name !== selectedCompany && c.modules.length > 0,
 					)
-					.map((c) => (
-						<ModuleTable
-							key={c.name}
-							modules={c.modules}
-							title={`Tarif (${c.name})`}
-							moduleCount={c.modules.length}
-							onRemoveModule={(id) =>
-								setCompaniesData((prev) =>
-									companyService.removeModuleFromCompany(
-										prev,
-										c.name,
-										id,
-									),
-								)
-							}
-							showResetButton={true}
-							onResetAll={() =>
-								setCompaniesData((prev) =>
-									companyService.resetCompanyModules(
-										prev,
-										c.name,
-									),
-								)
-							}
-						/>
-					))}
+					.map((c) => {
+						const availableForOther = AVAILABLE_MODULES.filter(
+							(m) => !c.modules.some((sm) => sm.id === m.id),
+						);
+						return (
+							<ModuleTable
+								key={c.name}
+								modules={c.modules}
+								title={`Tarif (${c.name})`}
+								moduleCount={c.modules.length}
+								onRemoveModule={(id) =>
+									setCompaniesData((prev) =>
+										companyService.removeModuleFromCompany(
+											prev,
+											c.name,
+											id,
+										),
+									)
+								}
+								showResetButton={true}
+								onResetAll={() =>
+									setCompaniesData((prev) =>
+										companyService.resetCompanyModules(
+											prev,
+											c.name,
+										),
+									)
+								}
+								footer={
+									<ModuleSelect
+										availableModules={availableForOther}
+										selectedModules={c.modules}
+										onSelectModule={(moduleId) => {
+											const moduleToAdd =
+												AVAILABLE_MODULES.find(
+													(m) => m.id === moduleId,
+												);
+											if (!moduleToAdd) return;
+											setCompaniesData((prev) =>
+												companyService.addModuleToCompany(
+													prev,
+													c.name,
+													moduleToAdd,
+												),
+											);
+										}}
+									/>
+								}
+							/>
+						);
+					})}
 			</VStack>
 		</VStack>
 	);

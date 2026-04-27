@@ -13,7 +13,7 @@ import {
 	useToast,
 } from "@chakra-ui/react";
 import { MdAnalytics, MdPowerSettingsNew, MdTrendingUp } from "react-icons/md";
-import Modules from "./modules";
+import Modules from "./Modules";
 
 // Məlumat qutuları üçün ortaq komponent
 const DataBox = ({ label, value, color = "#718096" }) => (
@@ -118,7 +118,6 @@ function Home({ customerData: initialData }) {
 								size="sm"
 								colorScheme="cyan"
 								variant="outline"
-								onClick={handleEndSession}
 							>
 								Kredit Ver
 							</Button>
@@ -126,7 +125,6 @@ function Home({ customerData: initialData }) {
 								size="sm"
 								colorScheme="cyan"
 								variant="outline"
-								onClick={handleEndSession}
 							>
 								Tarixce
 							</Button>

@@ -14,7 +14,7 @@ import {
 	HStack,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
-import MOCK_CUSTOMERS from "./data/customers.json";
+import MOCK_CUSTOMERS from "./data/users.json";
 import BeinLogo from "./logo.ico";
 
 function Header({ onSelectCustomer }) {

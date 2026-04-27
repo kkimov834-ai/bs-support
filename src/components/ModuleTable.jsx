@@ -27,6 +27,7 @@ const ModuleTable = React.memo(
 		onRemoveModule,
 		showResetButton,
 		onResetAll,
+	footer = null,
 	}) => {
 		return (
 			<Box
@@ -66,6 +67,9 @@ const ModuleTable = React.memo(
 						</Button>
 					)}
 				</HStack>
+
+				{/* optional footer (e.g. ModuleSelect) */}
+				{footer}
 
 				<TableContainer
 					border="1px solid"
