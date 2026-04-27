@@ -3,128 +3,92 @@ import { VStack } from "@chakra-ui/react";
 import {
 	AVAILABLE_MODULES,
 	COMPANIES,
-	INITIAL_STATE,
+	INITIAL_COMPANIES,
 } from "./data/availableModules";
 import CompanySelector from "./components/CompanySelector";
 import ModuleSelect from "./components/ModuleSelect";
 import ModuleTable from "./components/ModuleTable";
-
-/**
- * Modules - Ana komponent
- * Şirkətlər üçün modulları seçmə və idarə etmə
- */
+import * as companyService from "./services/companyService";
+import * as storageService from "./services/storageService";
 function Modules() {
-	// State Management
-	const [selectedCompany, setSelectedCompany] = useState("Zentra");
-	const [previousCompany, setPreviousCompany] = useState("Zentra");
-	const [companyModules, setCompanyModules] = useState(INITIAL_STATE);
+	// companiesData holds array: [{ name, modules: [] }]
+	const [companiesData, setCompaniesData] = useState(() =>
+		storageService.loadCompanies(INITIAL_COMPANIES),
+	);
+	const [selectedCompany, setSelectedCompany] = useState(() => COMPANIES[0]);
 
-	// localStorage-dan məlumatları yükləmə
 	useEffect(() => {
-		const savedModules = localStorage.getItem("companyModules");
-		if (savedModules) {
-			try {
-				setCompanyModules(JSON.parse(savedModules));
-			} catch (error) {
-				console.error("localStorage yükləmədə xəta:", error);
-			}
-		}
-	}, []); // Only on mount
+		storageService.saveCompanies(companiesData);
+	}, [companiesData]);
 
-	// companyModules dəyişdikdə localStorage-ə saxla
-	useEffect(() => {
-		localStorage.setItem("companyModules", JSON.stringify(companyModules));
-	}, [companyModules]); // Only depends on companyModules
-
-	/**
-	 * Şirkət seçimi dəyişdikdə
-	 * useCallback ile memoized - dependency'leri minimal
-	 */
 	const handleSelectCompany = useCallback((newCompany) => {
-		setSelectedCompany((prev) => {
-			setPreviousCompany(prev);
-			return newCompany;
-		});
-	}, []); // No dependencies
+		setSelectedCompany(newCompany);
+	}, []);
 
-	/**
-	 * Modul əlavə etmə
-	 * useCallback ile memoized
-	 */
 	const handleSelectModule = useCallback(
 		(moduleId) => {
 			if (!moduleId) return;
-
 			const moduleToAdd = AVAILABLE_MODULES.find(
 				(m) => m.id === moduleId,
 			);
-
-			setCompanyModules((prev) => {
-				// Dublikat kontrolu
-				if (
-					moduleToAdd &&
-					!prev[selectedCompany].find((m) => m.id === moduleId)
-				) {
-					return {
-						...prev,
-						[selectedCompany]: [
-							...prev[selectedCompany],
-							moduleToAdd,
-						],
-					};
-				}
-				return prev;
-			});
+			if (!moduleToAdd) return;
+			setCompaniesData((prev) =>
+				companyService.addModuleToCompany(
+					prev,
+					selectedCompany,
+					moduleToAdd,
+				),
+			);
 		},
 		[selectedCompany],
 	);
 
-	/**
-	 * Modul silmə
-	 * useCallback ile memoized
-	 */
 	const handleRemoveModule = useCallback(
 		(moduleId) => {
-			setCompanyModules((prev) => ({
-				...prev,
-				[selectedCompany]: prev[selectedCompany].filter(
-					(m) => m.id !== moduleId,
+			setCompaniesData((prev) =>
+				companyService.removeModuleFromCompany(
+					prev,
+					selectedCompany,
+					moduleId,
 				),
-			}));
+			);
 		},
 		[selectedCompany],
 	);
 
-	/**
-	 * Bütün modulları sıfırla
-	 * useCallback ile memoized
-	 */
 	const handleResetAll = useCallback(() => {
-		setCompanyModules((prev) => ({
-			...prev,
-			[selectedCompany]: [],
-		}));
+		setCompaniesData((prev) =>
+			companyService.resetCompanyModules(prev, selectedCompany),
+		);
 	}, [selectedCompany]);
 
-	// useMemo ile cari company modullarını memoize et
-	const currentCompanyModules = useMemo(
-		() => companyModules[selectedCompany] || [],
-		[companyModules, selectedCompany],
+	// Derived values
+	const currentCompany = useMemo(
+		() =>
+			companyService.findCompany(companiesData, selectedCompany) || {
+				modules: [],
+			},
+		[companiesData, selectedCompany],
 	);
+	const currentCompanyModules = currentCompany.modules || [];
 
-	// useMemo ile evvelki company modullarını memoize et
-	const previousCompanyModules = useMemo(
-		() => companyModules[previousCompany] || [],
-		[companyModules, previousCompany],
-	);
-
-	// useMemo ile mövcud modulları filter et
 	const availableModulesToSelect = useMemo(
 		() =>
 			AVAILABLE_MODULES.filter(
-				(m) => !currentCompanyModules.find((sm) => sm.id === m.id),
+				(m) => !currentCompanyModules.some((sm) => sm.id === m.id),
 			),
 		[currentCompanyModules],
+	);
+
+	// Show selector only companies that have no modules (or the currently selected one)
+	const selectableCompanyNames = useMemo(
+		() =>
+			companiesData
+				.filter(
+					(c) => c.name === selectedCompany || c.modules.length === 0,
+				)
+				.map((c) => c.name),
+		[companiesData, selectedCompany],
 	);
 
 	return (
@@ -132,13 +96,12 @@ function Modules() {
 			{/* Şirkət Seçicisi */}
 			<CompanySelector
 				selectedCompany={selectedCompany}
-				companies={COMPANIES}
+				companies={selectableCompanyNames}
 				onSelectCompany={handleSelectCompany}
 			/>
 
 			{/* Cədvəllər Bölümü */}
 			<VStack spacing={6} w="100%" align="stretch">
-				{/* CARİ ŞİRKƏT CƏDVƏLI */}
 				<VStack spacing={4} w="100%" align="stretch">
 					<ModuleSelect
 						availableModules={availableModulesToSelect}
@@ -155,16 +118,38 @@ function Modules() {
 					/>
 				</VStack>
 
-				{/* ÖNCƏKİ ŞİRKƏT CƏDVƏLI */}
-				{previousCompany && previousCompany !== selectedCompany && (
-					<ModuleTable
-						modules={previousCompanyModules}
-						title={`Evvelki Tarif (${previousCompany})`}
-						moduleCount={previousCompanyModules.length}
-						onRemoveModule={handleRemoveModule}
-						showResetButton={false}
-					/>
-				)}
+				{/* Render other companies with modules as separate tables (read-only selection) */}
+				{companiesData
+					.filter(
+						(c) =>
+							c.name !== selectedCompany && c.modules.length > 0,
+					)
+					.map((c) => (
+						<ModuleTable
+							key={c.name}
+							modules={c.modules}
+							title={`Tarif (${c.name})`}
+							moduleCount={c.modules.length}
+							onRemoveModule={(id) =>
+								setCompaniesData((prev) =>
+									companyService.removeModuleFromCompany(
+										prev,
+										c.name,
+										id,
+									),
+								)
+							}
+							showResetButton={true}
+							onResetAll={() =>
+								setCompaniesData((prev) =>
+									companyService.resetCompanyModules(
+										prev,
+										c.name,
+									),
+								)
+							}
+						/>
+					))}
 			</VStack>
 		</VStack>
 	);

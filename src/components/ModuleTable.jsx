@@ -9,7 +9,6 @@ import {
 	Tr,
 	Text,
 	VStack,
-	Badge,
 	IconButton,
 	Button,
 	HStack,
@@ -18,19 +17,13 @@ import {
 import { MdDeleteOutline } from "react-icons/md";
 
 /**
- * ModuleTable - Modullar cədvəli komponenti
- * @param {Array} modules - Göstəriləcək modullar
- * @param {string} title - Cədvəl başlığı
- * @param {number} moduleCount - Modulların sayı (badge üçün)
- * @param {Function} onRemoveModule - Modul silinmə callback
- * @param {boolean} showResetButton - Reset düyməsi göstərilsin mi
- * @param {Function} onResetAll - Hamısını sıfırla callback
+ * ModuleTable - clean, limit removed
  */
 const ModuleTable = React.memo(
 	({
-		modules,
+		modules = [],
 		title,
-		moduleCount,
+		moduleCount = 0,
 		onRemoveModule,
 		showResetButton,
 		onResetAll,
@@ -45,7 +38,6 @@ const ModuleTable = React.memo(
 				p={6}
 				boxShadow="2xl"
 			>
-				{/* Başlıq */}
 				<HStack mb={6} w="100%">
 					<VStack align="start" spacing={1}>
 						<HStack>
@@ -53,14 +45,9 @@ const ModuleTable = React.memo(
 								{title}
 							</Text>
 							{moduleCount > 0 && (
-								<Badge
-									colorScheme="teal"
-									variant="subtle"
-									borderRadius="md"
-									px={2}
-								>
+								<Text color="gray.400" fontSize="sm">
 									{moduleCount} Tarif
-								</Badge>
+								</Text>
 							)}
 						</HStack>
 						<Text color="gray.500" fontSize="xs">
@@ -80,7 +67,6 @@ const ModuleTable = React.memo(
 					)}
 				</HStack>
 
-				{/* Cədvəl */}
 				<TableContainer
 					border="1px solid"
 					borderColor="#2D3748"
@@ -98,9 +84,6 @@ const ModuleTable = React.memo(
 									isNumeric
 								>
 									QİYMƏT
-								</Th>
-								<Th color="gray.400" borderColor="#2D3748">
-									LİMİT
 								</Th>
 								<Th
 									color="gray.400"
@@ -143,15 +126,6 @@ const ModuleTable = React.memo(
 										>
 											{modul.qiymet} AZN
 										</Td>
-										<Td borderColor="#2D3748">
-											<Badge
-												variant="outline"
-												colorScheme="gray"
-												fontSize="10px"
-											>
-												{modul.limit}
-											</Badge>
-										</Td>
 										<Td
 											borderColor="#2D3748"
 											isNumeric
@@ -183,7 +157,7 @@ const ModuleTable = React.memo(
 								))
 							) : (
 								<Tr>
-									<Td colSpan={5} textAlign="center" py={12}>
+									<Td colSpan={4} textAlign="center" py={12}>
 										<VStack spacing={2}>
 											<Text color="gray.500">
 												Heç bir tarif seçilməyib.
@@ -203,7 +177,6 @@ const ModuleTable = React.memo(
 					</Table>
 				</TableContainer>
 
-				{/* Yekun Qiymət */}
 				{modules && modules.length > 0 && (
 					<HStack
 						mt={6}
