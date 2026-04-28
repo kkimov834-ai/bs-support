@@ -27,7 +27,7 @@ const ModuleTable = React.memo(
 		onRemoveModule,
 		showResetButton,
 		onResetAll,
-	footer = null,
+		footer = null,
 	}) => {
 		return (
 			<Box

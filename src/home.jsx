@@ -95,18 +95,18 @@ function Home({ customerData: initialData }) {
 						color="#4FD1C5"
 					/>
 
-					<VStack align="start" spacing={5} w="100%">
+					<VStack align="start" spacing={3} w="100%">
 						<HStack justifyContent="space-between" w="100%">
 							<Heading size="md" color="white">
 								Müştəri Paneli
 							</Heading>
 							{data && (
-								<HStack spacing={3}>
+								<HStack spacing={2}>
 									<Button
 										size="sm"
-										colorScheme="red"
+										margin={2}
+										colorScheme="cyan"
 										variant="outline"
-										leftIcon={<MdPowerSettingsNew />}
 										onClick={handleEndSession}
 									>
 										Sessiyanı Bitir
@@ -126,7 +126,14 @@ function Home({ customerData: initialData }) {
 								colorScheme="cyan"
 								variant="outline"
 							>
-								Tarixce
+								Bonus Ver
+							</Button>
+							<Button
+								size="sm"
+								colorScheme="cyan"
+								variant="outline"
+							>
+								Tarixçə
 							</Button>
 						</HStack>
 
@@ -135,12 +142,12 @@ function Home({ customerData: initialData }) {
 						{data ? (
 							<Flex wrap="wrap" gap={4} w="100%">
 								<DataBox
-									label="Müştəri"
+									label="Ad"
 									value={`${data.ad}`}
 									color="white"
 								/>
 								<DataBox
-									label="Müştəri"
+									label="Soyad"
 									value={`${data.soyad}`}
 									color="white"
 								/>

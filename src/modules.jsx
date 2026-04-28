@@ -105,7 +105,7 @@ function Modules() {
 				<VStack spacing={4} w="100%" align="stretch">
 					<ModuleTable
 						modules={currentCompanyModules}
-						title={`Cari Tarif (${selectedCompany})`}
+						title={`${selectedCompany}`}
 						moduleCount={currentCompanyModules.length}
 						onRemoveModule={handleRemoveModule}
 						showResetButton={true}
@@ -134,7 +134,7 @@ function Modules() {
 							<ModuleTable
 								key={c.name}
 								modules={c.modules}
-								title={`Tarif (${c.name})`}
+								title={`${c.name}`}
 								moduleCount={c.modules.length}
 								onRemoveModule={(id) =>
 									setCompaniesData((prev) =>

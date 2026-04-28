@@ -43,7 +43,7 @@ const CompanySelector = React.memo(
 					w="250px"
 				>
 					<Select
-						placeholder="Şirkət Seçin"
+						placeholder="Modul Seçin"
 						variant="filled"
 						value={selectedCompany}
 						onChange={(e) => onSelectCompany(e.target.value)}

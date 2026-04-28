@@ -12,6 +12,7 @@ const ModuleSelect = React.memo(
 		return (
 			<Box w="280px">
 				<Select
+					mb={4}
 					placeholder="+ Xidmət Əlavə Et"
 					onChange={(e) => {
 						onSelectModule(parseInt(e.target.value));
