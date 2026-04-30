@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Grid, GridItem, Box } from "@chakra-ui/react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-import Modules from "./Home";
+import Modules from "../pages/Home";
 import AIAssistant from "./AIAssistant"; // Sağ tərəfdəki panel
 
 function Dashboard() {

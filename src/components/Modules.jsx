@@ -4,12 +4,12 @@ import {
 	AVAILABLE_MODULES,
 	COMPANIES,
 	INITIAL_COMPANIES,
-} from "./data/availableModules";
-import CompanySelector from "./components/CompanySelector";
-import ModuleSelect from "./components/ModuleSelect";
-import ModuleTable from "./components/ModuleTable";
-import * as companyService from "./services/companyService";
-import * as storageService from "./services/storageService";
+} from "../data/availableModules";
+import CompanySelector from "./CompanySelector";
+import ModuleSelect from "./ModuleSelect";
+import ModuleTable from "./ModuleTable";
+import * as companyService from "../services/companyService";
+import * as storageService from "../services/storageService";
 function Modules() {
 	// companiesData holds array: [{ name, modules: [] }]
 	const [companiesData, setCompaniesData] = useState(() =>

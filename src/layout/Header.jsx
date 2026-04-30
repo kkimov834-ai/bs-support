@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Box,
 	Flex,
@@ -14,12 +14,34 @@ import {
 	HStack,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
-import MOCK_CUSTOMERS from "./data/users.json";
-import BeinLogo from "./logo.ico";
+import { getUserAccounts } from "../api/userAccountService";
+import { getUserInfo } from "../api/userInfoService";
 
 function Header({ onSelectCustomer }) {
+	const [selectedUsers, setSelectedUsers] = useState([]);
 	const [searchValue, setSearchValue] = useState("");
 	const [results, setResults] = useState([]);
+
+	useEffect(() => {
+		const loadData = async () => {
+			const response = await getUserAccounts();
+			if (response && response.data) {
+				setSelectedUsers(response.data);
+			}
+		};
+
+		loadData();
+	}, []);
+
+	const handleSelectUser = async (account) => {
+		console.log("Seçilən Hesab:", account);
+
+		const data = await getUserInfo(account);
+
+		if (data) {
+			console.log("Data:", data);
+		}
+	};
 
 	const handleSearch = (e) => {
 		const term = e.target.value.toLowerCase().trim();
@@ -31,22 +53,22 @@ function Header({ onSelectCustomer }) {
 		}
 
 		// Filtrləmə məntiqi: Ad, Soyad və ya Profil üzrə
-		const filtered = MOCK_CUSTOMERS.filter((c) => {
-			const firstName = c.ad?.toLowerCase() || "";
-			const lastName = c.soyad?.toLowerCase() || "";
-			const profile = c.profil?.toLowerCase() || "";
+		const filtered = selectedUsers.filter((data) => {
+			const accounts = data.account?.toLowerCase() || "";
+			const firstName = data.name?.toLowerCase() || "";
+			const lastName = data.lastname?.toLowerCase() || "";
 
 			return (
 				firstName.startsWith(term) ||
 				lastName.startsWith(term) ||
-				profile.includes(term)
+				accounts.includes(term)
 			);
 		});
 
 		// Sıralama məntiqi: Axtarılan sözlə başlayanlar öndə gəlsin
 		const sortedResults = filtered.sort((a, b) => {
-			const aFirst = a.ad.toLowerCase();
-			const bFirst = b.ad.toLowerCase();
+			const aFirst = a.name.toLowerCase();
+			const bFirst = b.name.toLowerCase();
 
 			if (aFirst.startsWith(term) && !bFirst.startsWith(term)) return -1;
 			if (!aFirst.startsWith(term) && bFirst.startsWith(term)) return 1;
@@ -70,7 +92,7 @@ function Header({ onSelectCustomer }) {
 				<Flex justify="space-between" align="center">
 					<HStack spacing={4}>
 						<Image
-							src={BeinLogo}
+							src="/logo.ico"
 							alt="Logo"
 							boxSize="40px"
 							borderRadius="full"
@@ -115,11 +137,11 @@ function Header({ onSelectCustomer }) {
 								color="white"
 								maxH="300px"
 								overflowY="auto"
-								zIndex={1001}
+								zIndex="1001"
 							>
-								{results.map((c) => (
+								{results.map((data) => (
 									<ListItem
-										key={c.id}
+										key={data}
 										p={3}
 										borderBottom="1px solid rgba(255,255,255,0.05)"
 										_hover={{
@@ -128,16 +150,19 @@ function Header({ onSelectCustomer }) {
 											color: "#4FD1C5",
 										}}
 										onClick={() => {
-											onSelectCustomer(c);
+											onSelectCustomer(data);
 											setResults([]);
 											setSearchValue("");
 										}}
 									>
+										<Text fontSize="xs" color="gray.400">
+											{data.account}
+										</Text>
 										<Text fontWeight="bold" fontSize="sm">
-											{c.ad} {c.soyad}
+											{data.name} {data.lastname}
 										</Text>
 										<Text fontSize="xs" color="gray.400">
-											{c.profil} • {c.email}
+											{data.email}
 										</Text>
 									</ListItem>
 								))}

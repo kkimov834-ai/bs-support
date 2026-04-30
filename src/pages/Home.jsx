@@ -13,7 +13,7 @@ import {
 	useToast,
 } from "@chakra-ui/react";
 import { MdAnalytics, MdPowerSettingsNew, MdTrendingUp } from "react-icons/md";
-import Modules from "./Modules";
+import Modules from "../components/Modules";
 
 // Məlumat qutuları üçün ortaq komponent
 const DataBox = ({ label, value, color = "#718096" }) => (
@@ -35,7 +35,7 @@ const DataBox = ({ label, value, color = "#718096" }) => (
 	</Box>
 );
 
-function Home({ customerData: initialData }) {
+function Home({ customerData: initialData, selectedUser, customerLoading }) {
 	const [data, setData] = useState(initialData);
 	const [companyModules, setCompanyModules] = useState({});
 	const toast = useToast();
@@ -53,7 +53,7 @@ function Home({ customerData: initialData }) {
 		toast({
 			title: "Sessiya sonlandırıldı.",
 			status: "warning",
-			duration: 3000,
+			duration: 1000,
 			isClosable: true,
 			position: "top-right",
 		});
@@ -139,37 +139,30 @@ function Home({ customerData: initialData }) {
 
 						<Divider borderColor="#2D3748" />
 
-						{data ? (
+						{customerLoading ? (
+							<Text>Loading...</Text>
+						) : data ? (
 							<Flex wrap="wrap" gap={4} w="100%">
 								<DataBox
-									label="Ad"
-									value={`${data.ad}`}
+									label="Account"
+									value={`${data.account}`}
 									color="white"
-								/>
-								<DataBox
-									label="Soyad"
-									value={`${data.soyad}`}
-									color="white"
-								/>
-								<DataBox
-									label="Profil"
-									value={data.profil}
-									color="#4FD1C5"
 								/>
 								<DataBox label="E-poçt" value={data.email} />
-								<DataBox label="Telefon" value={data.telefon} />
 								<DataBox
-									label="Balans"
-									value={`${data.balans} AZN`}
-									color="yellow.400"
+									label="Soyad"
+									value={`${data.lastname}`}
+									color="white"
 								/>
+								<DataBox
+									label="İstifadəçi adı"
+									value={`${data.name}`}
+									color="white"
+								/>
+								<DataBox label="Telefon" value={data.phone} />
 								<DataBox
 									label="Qeydiyyat Tarixi"
-									value={data.qeydiyyat_tarixi}
-								/>
-								<DataBox
-									label="Aylıq Tarif"
-									value={data.ayliq_tarif}
+									value={data.registermoment}
 								/>
 							</Flex>
 						) : (
@@ -215,7 +208,7 @@ function Home({ customerData: initialData }) {
 						<Divider borderColor="gray.700" />
 						<Text fontSize="md" color="#718096">
 							{data
-								? `${data.ad} ${data.soyad} üçün real-vaxt metrikləri və modul keçidləri izlənilir.`
+								? `${data.name} ${data.lastname} üçün real-vaxt metrikləri və modul keçidləri izlənilir.`
 								: "Sessiya bağlıdır. Sistem metrikləri gözləmə rejimindədir."}
 						</Text>
 						{data && (
@@ -234,4 +227,4 @@ function Home({ customerData: initialData }) {
 	);
 }
 
-export default Home;
+export default React.memo(Home);

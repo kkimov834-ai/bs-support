@@ -168,7 +168,11 @@ const MiniTerminal = () => {
 			style={terminalStyle}
 			ref={terminalRef}
 		>
-			<div style={{ color: "#ff5f56", marginBottom: "10px" }}>● ● ●</div>
+			<div style={{ display: "flex", gap: "5px", marginBottom: "10px" }}>
+				<div style={{ color: "#FF5F56", marginBottom: "10px" }}>●</div>
+				<div style={{ color: "#FFBD2E", marginBottom: "10px" }}>●</div>
+				<div style={{ color: "#27C93F", marginBottom: "10px" }}>●</div>
+			</div>
 			<pre
 				style={{
 					margin: 0,
