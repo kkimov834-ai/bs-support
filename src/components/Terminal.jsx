@@ -163,7 +163,6 @@ const MiniTerminal = () => {
 
 	return (
 		<div
-			marginTop="20px"
 			className="terminal-container"
 			style={terminalStyle}
 			ref={terminalRef}

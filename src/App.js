@@ -14,6 +14,9 @@ import AISection from "./components/AiSection";
 import Modules from "./pages/Home";
 import { getUserAccounts } from "./api/userAccountService";
 import { getUserInfo } from "./api/userInfoService";
+import { userProfiles } from "./api/userProfilesService";
+import { getUserHistory } from "./api/userHistoryService";
+import { getUserModules } from "./api/userModulesService";
 
 function App() {
 	// 1. Auth Statusunu Yoxlayırıq
@@ -22,29 +25,40 @@ function App() {
 	// 2. Müştəri Seçim State-i
 	const [userAccounts, setUserAccounts] = useState(null);
 	const [selectedCustomer, setSelectedCustomer] = useState(null);
+	const [history, setHistory] = useState([]);
+	const [profiles, setProfiles] = useState(null);
+	const [userModules, setUserModules] = useState([])
 	const [customerLoading, setCustomerLoading] = useState(false);
 
 	const handleUserSearch = async () => {};
 
 	const readCustomerInfo = async (customer) => {
-		setCustomerLoading(true);
-		const response = await getUserInfo(customer.account);
-		if (response.status == "success") {
-			setSelectedCustomer(response.data);
-		} else {
-			setSelectedCustomer(null);
-		}
+    setCustomerLoading(true);
+    try {
+        // Hər üç məlumatı paralel şəkildə alırıq
+        const [userInfo, userProfilesData, userHistory, userModules] = await Promise.all([
+            getUserInfo(customer.account),
+            userProfiles(customer.account),
+			getUserHistory(customer.account),
+			getUserModules(customer.account)
+        ]);
 
-		setCustomerLoading(false);
-	};
+        // State-ləri yeniləyirik
+        setSelectedCustomer(userInfo);
+        setProfiles(userProfilesData);
+		setHistory(userHistory.data);
+		setUserModules(userModules)
 
-	useEffect(() => {
-		const fetchUserAccounts = async () => {
-			const accounts = await getUserAccounts();
-			setUserAccounts(accounts);
-		};
-		fetchUserAccounts();
-	}, []);
+    } catch (error) {
+        console.error("Məlumat gətirilərkən xəta:", error);
+        setSelectedCustomer(null);
+        setProfiles([]);
+		setHistory([]);
+		setUserModules([]);
+    } finally {
+        setCustomerLoading(false);
+    }
+};
 
 	// Yüklənmə və ya Yönləndirmə zamanı Spinner göstər
 	if (isLoading) {
@@ -80,6 +94,9 @@ function App() {
 							<Box flex={1}>
 								{/* Modules-ə seçilmiş datanı ötürürük */}
 								<Modules
+									userHistory={history}
+									profileUsers={profiles}
+									userModules={userModules}
 									customerData={selectedCustomer}
 									customerLoading={customerLoading}
 								/>
